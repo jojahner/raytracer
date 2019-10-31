@@ -10,8 +10,21 @@ pub struct Color {
 }
 
 impl Color {
-    fn new(red: f32, green: f32, blue: f32) -> Color {
+    pub fn new(red: f32, green: f32, blue: f32) -> Color {
         Color { red, green, blue }
+    }
+
+    pub fn black() -> Color {
+        Color::new(0.0, 0.0, 0.0)
+    }
+
+    pub fn convert_component(component: f32) -> u8 {
+        let value = (component * 255.0).round() as i32;
+        match value {
+            val if val < 0 => 0,
+            val if val > 255 => 255,
+            val => val as u8,
+        }
     }
 }
 
