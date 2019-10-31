@@ -2,58 +2,12 @@ use std::ops;
 
 use crate::math::Vector;
 
-#[derive(Copy, Clone, Debug)]
-pub struct Point {
-    pub x: f32,
-    pub y: f32,
-    pub z: f32,
-}
-
-impl Point {
-    pub fn new(x: f32, y: f32, z: f32) -> Point {
-        Point { x, y, z }
-    }
-}
-
-impl PartialEq for Point {
-    fn eq(&self, other: &Self) -> bool {
-        (self.x - other.x).abs() < 1.0e-6
-            && (self.y - other.y).abs() < 1.0e-6
-            && (self.z - other.z).abs() < 1.0e-6
-    }
-}
-
-impl ops::Add<Vector> for Point {
-    type Output = Point;
-
-    fn add(self, other: Vector) -> Self::Output {
-        Point::new(self.x + other.x, self.y + other.y, self.z + other.z)
-    }
-}
-
-impl ops::Sub<Point> for Point {
-    type Output = Vector;
-
-    fn sub(self, other: Point) -> Self::Output {
-        Vector::new(self.x - other.x, self.y - other.y, self.z - other.z)
-    }
-}
-
-impl ops::Sub<Vector> for Point {
-    type Output = Point;
-
-    fn sub(self, other: Vector) -> Self::Output {
-        Point::new(self.x - other.x, self.y - other.y, self.z - other.z)
-    }
-}
-
-impl ops::Neg for Point {
-    type Output = Point;
-
-    fn neg(self) -> Self::Output {
-        Point::new(-self.x, -self.y, -self.z)
-    }
-}
+define_tuple3!(Point);
+define_tuple3_constructor!(Point);
+define_tuple3_add!(Point, Vector, Point);
+define_tuple3_sub!(Point, Point, Vector);
+define_tuple3_sub!(Point, Vector, Point);
+define_tuple3_neg!(Point);
 
 #[cfg(test)]
 mod tests {
