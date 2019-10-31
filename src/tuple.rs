@@ -27,13 +27,13 @@ impl Vector {
         }
     }
 
-    pub fn dot(&self, other: &Vector) -> f32 {
+    pub fn dot(&self, other: Vector) -> f32 {
         self.x * other.x +
         self.y * other.y +
         self.z * other.z
     }
 
-    pub fn cross(&self, other: &Vector) -> Vector {
+    pub fn cross(&self, other: Vector) -> Vector {
         Vector {
             x: self.y * other.z - self.z * other.y,
             y: self.z * other.x - self.x * other.z,
@@ -239,7 +239,7 @@ mod tests {
         let a = Vector { x: 1.0, y: 2.0, z: 3.0 };
         let b = Vector { x: 2.0, y: 3.0, z: 4.0 };
 
-        assert_approx_eq!(a.dot(&b), 20.0)
+        assert_approx_eq!(a.dot(b), 20.0)
     }
 
     #[test]
@@ -247,7 +247,7 @@ mod tests {
         let a = Vector { x: 1.0, y: 2.0, z: 3.0 };
         let b = Vector { x: 2.0, y: 3.0, z: 4.0 };
 
-        assert_eq!(a.cross(&b), Vector { x: -1.0, y: 2.0, z: -1.0 });
-        assert_eq!(b.cross(&a), Vector { x: 1.0, y: -2.0, z: 1.0 });
+        assert_eq!(a.cross(b), Vector { x: -1.0, y: 2.0, z: -1.0 });
+        assert_eq!(b.cross(a), Vector { x: 1.0, y: -2.0, z: 1.0 });
     }
 }
