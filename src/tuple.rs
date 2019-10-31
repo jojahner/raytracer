@@ -1,25 +1,25 @@
 use std::ops;
 
-#[derive(PartialEq, Debug)]
+#[derive(Copy, Clone, PartialEq, Debug)]
 pub struct Vector {
-    x: f64,
-    y: f64,
-    z: f64,
+    pub x: f32,
+    pub y: f32,
+    pub z: f32,
 }
 
-#[derive(PartialEq, Debug)]
+#[derive(Copy, Clone, PartialEq, Debug)]
 pub struct Point  {
-    x: f64,
-    y: f64,
-    z: f64,
+    pub x: f32,
+    pub y: f32,
+    pub z: f32,
 }
 
 impl Vector {
-    fn magnitude(&self) -> f64 {
+    pub fn magnitude(&self) -> f32 {
         (self.x.powi(2) + self.y.powi(2) + self.z.powi(2)).sqrt()
     }
 
-    fn normalize(&self) -> Vector {
+    pub fn normalize(&self) -> Vector {
         Vector {
             x: self.x / self.magnitude(),
             y: self.y / self.magnitude(),
@@ -27,13 +27,13 @@ impl Vector {
         }
     }
 
-    fn dot(&self, other: &Vector) -> f64 {
+    pub fn dot(&self, other: &Vector) -> f32 {
         self.x * other.x +
         self.y * other.y +
         self.z * other.z
     }
 
-    fn cross(&self, other: &Vector) -> Vector {
+    pub fn cross(&self, other: &Vector) -> Vector {
         Vector {
             x: self.y * other.z - self.z * other.y,
             y: self.z * other.x - self.x * other.z,
@@ -106,18 +106,18 @@ impl ops::Neg for Vector {
     }
 }
 
-impl ops::Mul<f64> for Vector {
+impl ops::Mul<f32> for Vector {
     type Output = Self;
 
-    fn mul(self, rhs: f64) -> Self {
+    fn mul(self, rhs: f32) -> Self {
         Vector { x: self.x * rhs, y: self.y * rhs, z: self.z * rhs}
     }
 }
 
-impl ops::Div<f64> for Vector {
+impl ops::Div<f32> for Vector {
     type Output = Self;
 
-    fn div(self, rhs: f64) -> Self {
+    fn div(self, rhs: f32) -> Self {
         Vector { x: self.x / rhs, y: self.y / rhs, z: self.z / rhs}
     }
 }
@@ -125,6 +125,14 @@ impl ops::Div<f64> for Vector {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    macro_rules! assert_approx_eq {
+        ($a:expr, $b:expr) => ({
+            let (a, b) = (&$a, &$b);
+            assert!((*a - *b).abs() < 1.0e-6,
+                    "{} is not approximately equal to {}", *a, *b);
+        })
+    }
 
     #[test]
     fn add_point_to_vector() {
@@ -206,11 +214,11 @@ mod tests {
 
     #[test]
     fn magnitude_of_a_vector() {
-        assert_eq!(Vector { x: 1.0, y: 0.0, z: 0.0 }.magnitude(), 1.0);
-        assert_eq!(Vector { x: 0.0, y: 1.0, z: 0.0 }.magnitude(), 1.0);
-        assert_eq!(Vector { x: 0.0, y: 0.0, z: 1.0 }.magnitude(), 1.0);
-        assert_eq!(Vector { x: 1.0, y: 2.0, z: 3.0 }.magnitude(), 14.0_f64.sqrt());
-        assert_eq!(Vector { x: -1.0, y: -2.0, z: -3.0 }.magnitude(), 14.0_f64.sqrt());
+        assert_approx_eq!(Vector { x: 1.0, y: 0.0, z: 0.0 }.magnitude(), 1.0);
+        assert_approx_eq!(Vector { x: 0.0, y: 1.0, z: 0.0 }.magnitude(), 1.0);
+        assert_approx_eq!(Vector { x: 0.0, y: 0.0, z: 1.0 }.magnitude(), 1.0);
+        assert_approx_eq!(Vector { x: 1.0, y: 2.0, z: 3.0 }.magnitude(), 14.0_f32.sqrt());
+        assert_approx_eq!(Vector { x: -1.0, y: -2.0, z: -3.0 }.magnitude(), 14.0_f32.sqrt());
     }
 
     #[test]
@@ -221,8 +229,9 @@ mod tests {
         );
         assert_eq!(
             Vector { x: 1.0, y: 2.0, z: 3.0 }.normalize(),
-            Vector { x: 1.0 / 14.0_f64.sqrt(), y: 2.0 / 14.0_f64.sqrt(), z: 3.0 / 14.0_f64.sqrt() }
+            Vector { x: 1.0 / 14.0_f32.sqrt(), y: 2.0 / 14.0_f32.sqrt(), z: 3.0 / 14.0_f32.sqrt() }
         );
+        assert_approx_eq!(Vector { x: 1.0, y: 2.0, z: 3.0 }.normalize().magnitude(), 1.0)
     }
 
     #[test]
@@ -230,7 +239,7 @@ mod tests {
         let a = Vector { x: 1.0, y: 2.0, z: 3.0 };
         let b = Vector { x: 2.0, y: 3.0, z: 4.0 };
 
-        assert_eq!(a.dot(&b), 20.0)
+        assert_approx_eq!(a.dot(&b), 20.0)
     }
 
     #[test]
