@@ -1,15 +1,16 @@
-mod tuple;
+mod raytracer;
+use raytracer::{Point, Vector};
 
 #[derive(Copy, Clone, PartialEq, Debug)]
 struct Projectile {
-    position: tuple::Point,
-    velocity: tuple::Vector
+    position: Point,
+    velocity: Vector,
 }
 
 #[derive(Copy, Clone, PartialEq, Debug)]
 struct Environment {
-    gravity: tuple::Vector,
-    wind: tuple::Vector
+    gravity: Vector,
+    wind: Vector,
 }
 
 fn tick(projectile: Projectile, environment: Environment) -> Projectile {
@@ -19,16 +20,15 @@ fn tick(projectile: Projectile, environment: Environment) -> Projectile {
     Projectile { position, velocity }
 }
 
-
 fn main() {
     let mut projectile = Projectile {
-        position: tuple::Point { x: 0.0, y: 1.0, z: 0.0 },
-        velocity: tuple::Vector { x: 0.9, y: 0.75, z: 0.0 }.normalize()
+        position: Point::new(0.0, 1.0, 0.0),
+        velocity: Vector::new(0.9, 0.75, 0.0).normalize(),
     };
 
     let environment = Environment {
-        gravity: tuple::Vector { x: 0.0, y: -0.1, z: 0.0 },
-        wind: tuple::Vector { x: -0.01, y: 0.0, z: 0.0 },
+        gravity: Vector::new(0.0, -0.1, 0.0),
+        wind: Vector::new(-0.01, 0.0, 0.0),
     };
 
     loop {
