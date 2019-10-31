@@ -1,10 +1,10 @@
 use crate::color::Color;
-use std::fmt::{Error, Write};
+use std::fmt::Write;
 
-struct Canvas {
+pub struct Canvas {
     width: usize,
     height: usize,
-    pub bitmap: Vec<Color>,
+    bitmap: Vec<Color>,
 }
 
 impl Canvas {
