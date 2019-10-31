@@ -8,6 +8,13 @@
           "program": "${workspaceRoot}/target/debug/raytracer",
           "args": [],
           "cwd": "${workspaceRoot}",
+          "sourceLanguages": ["rust"],
+          "terminal": "console",
+          "cargo": {
+            "args": [
+              "build"
+            ]
+          }
       }
   ]
 }
