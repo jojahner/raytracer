@@ -1,8 +1,8 @@
 use std::ops;
 
-use crate::raytracer::vector::Vector;
+use crate::math::Vector;
 
-#[derive(Copy, Clone, PartialEq, Debug)]
+#[derive(Copy, Clone, Debug)]
 pub struct Point {
     pub x: f32,
     pub y: f32,
@@ -15,27 +15,35 @@ impl Point {
     }
 }
 
+impl PartialEq for Point {
+    fn eq(&self, other: &Self) -> bool {
+        (self.x - other.x).abs() < 1.0e-6
+            && (self.y - other.y).abs() < 1.0e-6
+            && (self.z - other.z).abs() < 1.0e-6
+    }
+}
+
 impl ops::Add<Vector> for Point {
     type Output = Point;
 
-    fn add(self, rhs: Vector) -> Self::Output {
-        Point::new(self.x + rhs.x, self.y + rhs.y, self.z + rhs.z)
+    fn add(self, other: Vector) -> Self::Output {
+        Point::new(self.x + other.x, self.y + other.y, self.z + other.z)
     }
 }
 
 impl ops::Sub<Point> for Point {
     type Output = Vector;
 
-    fn sub(self, rhs: Point) -> Self::Output {
-        Vector::new(self.x - rhs.x, self.y - rhs.y, self.z - rhs.z)
+    fn sub(self, other: Point) -> Self::Output {
+        Vector::new(self.x - other.x, self.y - other.y, self.z - other.z)
     }
 }
 
 impl ops::Sub<Vector> for Point {
     type Output = Point;
 
-    fn sub(self, rhs: Vector) -> Self::Output {
-        Point::new(self.x - rhs.x, self.y - rhs.y, self.z - rhs.z)
+    fn sub(self, other: Vector) -> Self::Output {
+        Point::new(self.x - other.x, self.y - other.y, self.z - other.z)
     }
 }
 

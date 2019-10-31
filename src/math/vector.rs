@@ -1,6 +1,6 @@
-use std::ops;
+use std::ops::{Add, Div, Mul, Neg, Sub};
 
-use crate::raytracer::point::Point;
+use crate::math::Point;
 
 #[derive(Copy, Clone, PartialEq, Debug)]
 pub struct Vector {
@@ -11,7 +11,7 @@ pub struct Vector {
 
 impl Vector {
     pub fn magnitude(&self) -> f32 {
-        (self.x.powi(2) + self.y.powi(2) + self.z.powi(2)).sqrt()
+        self.dot(self).sqrt()
     }
 
     pub fn normalize(&self) -> Vector {
@@ -22,7 +22,7 @@ impl Vector {
         )
     }
 
-    pub fn dot(&self, other: Vector) -> f32 {
+    pub fn dot(&self, other: &Vector) -> f32 {
         self.x * other.x + self.y * other.y + self.z * other.z
     }
 
@@ -39,31 +39,31 @@ impl Vector {
     }
 }
 
-impl ops::Add<Point> for Vector {
+impl Add<Point> for Vector {
     type Output = Point;
 
-    fn add(self, rhs: Point) -> Self::Output {
-        Point::new(self.x + rhs.x, self.y + rhs.y, self.z + rhs.z)
+    fn add(self, other: Point) -> Self::Output {
+        Point::new(self.x + other.x, self.y + other.y, self.z + other.z)
     }
 }
 
-impl ops::Add<Vector> for Vector {
+impl Add<Vector> for Vector {
     type Output = Vector;
 
-    fn add(self, rhs: Vector) -> Self::Output {
-        Vector::new(self.x + rhs.x, self.y + rhs.y, self.z + rhs.z)
+    fn add(self, other: Vector) -> Self::Output {
+        Vector::new(self.x + other.x, self.y + other.y, self.z + other.z)
     }
 }
 
-impl ops::Sub<Vector> for Vector {
+impl Sub<Vector> for Vector {
     type Output = Vector;
 
-    fn sub(self, rhs: Vector) -> Self::Output {
-        Vector::new(self.x - rhs.x, self.y - rhs.y, self.z - rhs.z)
+    fn sub(self, other: Vector) -> Self::Output {
+        Vector::new(self.x - other.x, self.y - other.y, self.z - other.z)
     }
 }
 
-impl ops::Neg for Vector {
+impl Neg for Vector {
     type Output = Vector;
 
     fn neg(self) -> Self::Output {
@@ -71,37 +71,25 @@ impl ops::Neg for Vector {
     }
 }
 
-impl ops::Mul<f32> for Vector {
+impl Mul<f32> for Vector {
     type Output = Self;
 
-    fn mul(self, rhs: f32) -> Self {
-        Vector::new(self.x * rhs, self.y * rhs, self.z * rhs)
+    fn mul(self, other: f32) -> Self {
+        Vector::new(self.x * other, self.y * other, self.z * other)
     }
 }
 
-impl ops::Div<f32> for Vector {
+impl Div<f32> for Vector {
     type Output = Self;
 
-    fn div(self, rhs: f32) -> Self {
-        Vector::new(self.x / rhs, self.y / rhs, self.z / rhs)
+    fn div(self, other: f32) -> Self {
+        Vector::new(self.x / other, self.y / other, self.z / other)
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    macro_rules! assert_approx_eq {
-        ($a:expr, $b:expr) => {{
-            let (a, b) = (&$a, &$b);
-            assert!(
-                (*a - *b).abs() < 1.0e-6,
-                "{} is not approximately equal to {}",
-                *a,
-                *b
-            );
-        }};
-    }
 
     #[test]
     fn add_point_to_vector() {
@@ -181,7 +169,7 @@ mod tests {
         let a = Vector::new(1.0, 2.0, 3.0);
         let b = Vector::new(2.0, 3.0, 4.0);
 
-        assert_approx_eq!(a.dot(b), 20.0)
+        assert_approx_eq!(a.dot(&b), 20.0)
     }
 
     #[test]

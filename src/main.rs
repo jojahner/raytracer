@@ -1,5 +1,4 @@
-mod raytracer;
-use raytracer::{Point, Vector};
+use raytracer::math::{Point, Vector};
 
 #[derive(Copy, Clone, PartialEq, Debug)]
 struct Projectile {
