@@ -41,7 +41,7 @@ impl Canvas {
         tga[14] = (255 & self.height) as u8;
         tga[15] = (255 & (self.height >> 8)) as u8;
         tga[16] = 24; // 24 bits per pixel
-        tga[17] = 0b0010_0000; // screen origin left-hand corder
+        tga[17] = 0b0010_0000; // screen origin upper left-hand corner
 
         for y in 0..self.height {
             for x in 0..self.width {
