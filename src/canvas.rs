@@ -16,21 +16,20 @@ impl Canvas {
     }
 
     pub fn write_pixel(&mut self, x: usize, y: usize, color: Color) {
-        assert!(x < self.width);
+        assert!(x < self.width); // TODO: real error handling
         assert!(y < self.height);
 
         self.bitmap[(y * self.width) + x] = color;
     }
 
     pub fn pixel_at(&self, x: usize, y: usize) -> Color {
-        assert!(x < self.width);
+        assert!(x < self.width); // TODO: real error handling
         assert!(y < self.height);
 
         self.bitmap[(y * self.width) + x]
     }
 
     pub fn to_tga(&self) -> Vec<u8> {
-        let mut pixels: Vec<u8> = vec![];
         let mut tga: [u8; 18] = [0; 18];
 
         // tga header
@@ -43,18 +42,19 @@ impl Canvas {
         tga[16] = 24; // 24 bits per pixel
         tga[17] = 0b0010_0000; // screen origin upper left-hand corner
 
+        let mut image: Vec<u8> = tga.to_vec();
+
         for y in 0..self.height {
             for x in 0..self.width {
                 let color = self.pixel_at(x, y);
 
-                pixels.push(Color::convert_component(color.blue));
-                pixels.push(Color::convert_component(color.green));
-                pixels.push(Color::convert_component(color.red));
+                image.push(Color::convert_component(color.blue));
+                image.push(Color::convert_component(color.green));
+                image.push(Color::convert_component(color.red));
             }
         }
-        let mut output: Vec<u8> = tga.to_vec();
-        output.append(&mut pixels);
-        output
+
+        image
     }
 }
 
