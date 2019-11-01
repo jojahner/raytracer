@@ -1,13 +1,13 @@
-use std::ops::{Add, Div, Mul, Neg, Sub};
+use std::ops;
 
 use crate::math::Point;
 
-#[derive(Copy, Clone, PartialEq, Debug)]
-pub struct Vector {
-    pub x: f32,
-    pub y: f32,
-    pub z: f32,
-}
+define_tuple3!(Vector);
+define_tuple3_constructor!(Vector);
+define_tuple3_add!(Vector, Vector, Vector);
+define_tuple3_add!(Vector, Point, Point);
+define_tuple3_sub!(Vector, Vector, Vector);
+define_tuple3_neg!(Vector);
 
 impl Vector {
     pub fn magnitude(&self) -> f32 {
@@ -33,45 +33,9 @@ impl Vector {
             self.x * other.y - self.y * other.x,
         )
     }
-
-    pub fn new(x: f32, y: f32, z: f32) -> Vector {
-        Vector { x, y, z }
-    }
 }
 
-impl Add<Point> for Vector {
-    type Output = Point;
-
-    fn add(self, other: Point) -> Self::Output {
-        Point::new(self.x + other.x, self.y + other.y, self.z + other.z)
-    }
-}
-
-impl Add<Vector> for Vector {
-    type Output = Vector;
-
-    fn add(self, other: Vector) -> Self::Output {
-        Vector::new(self.x + other.x, self.y + other.y, self.z + other.z)
-    }
-}
-
-impl Sub<Vector> for Vector {
-    type Output = Vector;
-
-    fn sub(self, other: Vector) -> Self::Output {
-        Vector::new(self.x - other.x, self.y - other.y, self.z - other.z)
-    }
-}
-
-impl Neg for Vector {
-    type Output = Vector;
-
-    fn neg(self) -> Self::Output {
-        Vector::new(-self.x, -self.y, -self.z)
-    }
-}
-
-impl Mul<f32> for Vector {
+impl ops::Mul<f32> for Vector {
     type Output = Self;
 
     fn mul(self, other: f32) -> Self {
@@ -79,7 +43,7 @@ impl Mul<f32> for Vector {
     }
 }
 
-impl Div<f32> for Vector {
+impl ops::Div<f32> for Vector {
     type Output = Self;
 
     fn div(self, other: f32) -> Self {
