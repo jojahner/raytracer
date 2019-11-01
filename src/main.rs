@@ -48,15 +48,15 @@ fn main() {
             break;
         }
     }
-    let ppm = canvas.to_ppm();
+    let mut data = canvas.to_tga();
 
-    let mut file = match File::create("output.ppm") {
-        Err(why) => panic!("couldn't create output.ppm: {}", why.description()),
+    let mut file = match File::create("output.tga") {
+        Err(why) => panic!("couldn't create output.tga: {}", why.description()),
         Ok(file) => file,
     };
 
-    match file.write_all(ppm.as_bytes()) {
-        Err(why) => panic!("couldn't write to output.ppm: {}", why.description()),
-        Ok(_) => println!("successfully wrote to output.ppm"),
+    match file.write_all(data.as_mut()) {
+        Err(why) => panic!("couldn't write to output.tga: {}", why.description()),
+        Ok(_) => println!("successfully wrote to output.tga"),
     }
 }

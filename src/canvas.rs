@@ -1,5 +1,4 @@
 use crate::color::Color;
-use std::fmt::Write;
 
 pub struct Canvas {
     width: usize,
@@ -30,41 +29,33 @@ impl Canvas {
         self.bitmap[(y * self.width) + x]
     }
 
-    pub fn to_ppm(&self) -> String {
-        let mut output = String::new();
-        write_ppm_header(&mut output, self);
+    pub fn to_tga(&self) -> Vec<u8> {
+        let mut pixels: Vec<u8> = vec![];
+        let mut tga: [u8; 18] = [0; 18];
+
+        // tga header
+        // see: http://www.gamers.org/dEngine/quake3/TGA.txt
+        tga[2] = 2; // uncompressed RGB data
+        tga[12] = (255 & self.width) as u8;
+        tga[13] = (255 & (self.width >> 8)) as u8;
+        tga[14] = (255 & self.height) as u8;
+        tga[15] = (255 & (self.height >> 8)) as u8;
+        tga[16] = 24; // 24 bits per pixel
+        tga[17] = 0b0010_0000; // screen origin left-hand corder
 
         for y in 0..self.height {
             for x in 0..self.width {
-                write_pixel_to_ppm(&mut output, self.pixel_at(x, y));
+                let color = self.pixel_at(x, y);
 
-                if x % 5 == 4 {
-                    output.write_str("\n").unwrap();
-                } else {
-                    output.write_str(" ").unwrap();
-                }
+                pixels.push(Color::convert_component(color.blue));
+                pixels.push(Color::convert_component(color.green));
+                pixels.push(Color::convert_component(color.red));
             }
         }
-
-        output.write_str("\n").unwrap();
+        let mut output: Vec<u8> = tga.to_vec();
+        output.append(&mut pixels);
         output
     }
-}
-
-fn write_ppm_header(w: &mut Write, canvas: &Canvas) {
-    w.write_str("P3\n").unwrap();
-    w.write_fmt(format_args!("{} {}\n", canvas.width, canvas.height))
-        .unwrap();
-    w.write_str("255\n").unwrap();
-}
-
-fn write_pixel_to_ppm(w: &mut Write, color: Color) {
-    let red = Color::convert_component(color.red);
-    let green = Color::convert_component(color.green);
-    let blue = Color::convert_component(color.blue);
-
-    w.write_fmt(format_args!("{} {} {}", red, green, blue))
-        .unwrap();
 }
 
 #[cfg(test)]
@@ -95,55 +86,5 @@ mod test {
 
         c.write_pixel(5, 5, red);
         assert_eq!(c.pixel_at(5, 5), Color::new(1.0, 0.0, 0.0));
-    }
-
-    #[test]
-    fn write_a_ppm_file() {
-        let mut c = Canvas::new(10, 2);
-        c.write_pixel(0, 0, Color::new(1.0, 0.8, 0.6));
-        c.write_pixel(1, 0, Color::new(1.0, 0.8, 0.6));
-        c.write_pixel(2, 0, Color::new(1.0, 0.8, 0.6));
-        c.write_pixel(3, 0, Color::new(1.0, 0.8, 0.6));
-        c.write_pixel(4, 0, Color::new(1.0, 0.8, 0.6));
-        c.write_pixel(5, 0, Color::new(1.0, 0.8, 0.6));
-        c.write_pixel(6, 0, Color::new(1.0, 0.8, 0.6));
-        c.write_pixel(7, 0, Color::new(1.0, 0.8, 0.6));
-        c.write_pixel(8, 0, Color::new(1.0, 0.8, 0.6));
-        c.write_pixel(9, 0, Color::new(1.0, 0.8, 0.6));
-        c.write_pixel(0, 1, Color::new(1.0, 0.8, 0.6));
-        c.write_pixel(1, 1, Color::new(1.0, 0.8, 0.6));
-        c.write_pixel(2, 1, Color::new(1.0, 0.8, 0.6));
-        c.write_pixel(3, 1, Color::new(1.0, 0.8, 0.6));
-        c.write_pixel(4, 1, Color::new(1.0, 0.8, 0.6));
-        c.write_pixel(5, 1, Color::new(1.0, 0.8, 0.6));
-        c.write_pixel(6, 1, Color::new(1.0, 0.8, 0.6));
-        c.write_pixel(7, 1, Color::new(1.0, 0.8, 0.6));
-        c.write_pixel(8, 1, Color::new(1.0, 0.8, 0.6));
-        c.write_pixel(9, 1, Color::new(1.0, 0.8, 0.6));
-
-        let ppm = c.to_ppm();
-        let mut lines = ppm.lines();
-
-        assert_eq!(lines.next(), Some("P3"));
-        assert_eq!(lines.next(), Some("10 2"));
-        assert_eq!(lines.next(), Some("255"));
-
-        assert_eq!(
-            lines.next(),
-            Some("255 204 153 255 204 153 255 204 153 255 204 153 255 204 153")
-        );
-        assert_eq!(
-            lines.next(),
-            Some("255 204 153 255 204 153 255 204 153 255 204 153 255 204 153")
-        );
-        assert_eq!(
-            lines.next(),
-            Some("255 204 153 255 204 153 255 204 153 255 204 153 255 204 153")
-        );
-        assert_eq!(
-            lines.next(),
-            Some("255 204 153 255 204 153 255 204 153 255 204 153 255 204 153")
-        );
-        assert_eq!(lines.next(), Some(""));
     }
 }
