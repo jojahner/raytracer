@@ -4,13 +4,13 @@ use crate::math::Point;
 
 #[derive(Copy, Clone, PartialEq, Debug)]
 pub struct Vector {
-    pub x: f32,
-    pub y: f32,
-    pub z: f32,
+    pub x: f64,
+    pub y: f64,
+    pub z: f64,
 }
 
 impl Vector {
-    pub fn magnitude(&self) -> f32 {
+    pub fn magnitude(&self) -> f64 {
         self.dot(self).sqrt()
     }
 
@@ -22,7 +22,7 @@ impl Vector {
         )
     }
 
-    pub fn dot(&self, other: &Vector) -> f32 {
+    pub fn dot(&self, other: &Vector) -> f64 {
         self.x * other.x + self.y * other.y + self.z * other.z
     }
 
@@ -34,7 +34,7 @@ impl Vector {
         )
     }
 
-    pub fn new(x: f32, y: f32, z: f32) -> Vector {
+    pub fn new(x: f64, y: f64, z: f64) -> Vector {
         Vector { x, y, z }
     }
 }
@@ -71,18 +71,18 @@ impl Neg for Vector {
     }
 }
 
-impl Mul<f32> for Vector {
+impl Mul<f64> for Vector {
     type Output = Self;
 
-    fn mul(self, other: f32) -> Self {
+    fn mul(self, other: f64) -> Self {
         Vector::new(self.x * other, self.y * other, self.z * other)
     }
 }
 
-impl Div<f32> for Vector {
+impl Div<f64> for Vector {
     type Output = Self;
 
-    fn div(self, other: f32) -> Self {
+    fn div(self, other: f64) -> Self {
         Vector::new(self.x / other, self.y / other, self.z / other)
     }
 }
@@ -143,8 +143,8 @@ mod tests {
         assert_approx_eq!(Vector::new(1.0, 0.0, 0.0).magnitude(), 1.0);
         assert_approx_eq!(Vector::new(0.0, 1.0, 0.0).magnitude(), 1.0);
         assert_approx_eq!(Vector::new(0.0, 0.0, 1.0).magnitude(), 1.0);
-        assert_approx_eq!(Vector::new(1.0, 2.0, 3.0).magnitude(), 14.0_f32.sqrt());
-        assert_approx_eq!(Vector::new(1.0, 2.0, 3.0).magnitude(), 14.0_f32.sqrt());
+        assert_approx_eq!(Vector::new(1.0, 2.0, 3.0).magnitude(), 14.0_f64.sqrt());
+        assert_approx_eq!(Vector::new(1.0, 2.0, 3.0).magnitude(), 14.0_f64.sqrt());
     }
 
     #[test]
@@ -156,9 +156,9 @@ mod tests {
         assert_eq!(
             Vector::new(1.0, 2.0, 3.0).normalize(),
             Vector::new(
-                1.0 / 14.0_f32.sqrt(),
-                2.0 / 14.0_f32.sqrt(),
-                3.0 / 14.0_f32.sqrt()
+                1.0 / 14.0_f64.sqrt(),
+                2.0 / 14.0_f64.sqrt(),
+                3.0 / 14.0_f64.sqrt()
             )
         );
         assert_approx_eq!(Vector::new(1.0, 2.0, 3.0).normalize().magnitude(), 1.0)

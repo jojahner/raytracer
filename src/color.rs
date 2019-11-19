@@ -1,16 +1,16 @@
 use std::ops;
 
-const EPSILON: f32 = 10e-6;
+const EPSILON: f64 = 10e-6;
 
 #[derive(Copy, Clone, Debug)]
 pub struct Color {
-    pub red: f32,
-    pub green: f32,
-    pub blue: f32,
+    pub red: f64,
+    pub green: f64,
+    pub blue: f64,
 }
 
 impl Color {
-    pub fn new(red: f32, green: f32, blue: f32) -> Color {
+    pub fn new(red: f64, green: f64, blue: f64) -> Color {
         Color { red, green, blue }
     }
 
@@ -18,7 +18,7 @@ impl Color {
         Color::new(0.0, 0.0, 0.0)
     }
 
-    pub fn convert_component(component: f32) -> u8 {
+    pub fn convert_component(component: f64) -> u8 {
         let value = (component * 255.0).round() as i32;
         match value {
             val if val < 0 => 0,
@@ -52,10 +52,10 @@ impl ops::Sub<Color> for Color {
     }
 }
 
-impl ops::Mul<f32> for Color {
+impl ops::Mul<f64> for Color {
     type Output = Self;
 
-    fn mul(self, other: f32) -> Self::Output {
+    fn mul(self, other: f64) -> Self::Output {
         Color::new(self.red * other, self.green * other, self.blue * other)
     }
 }
