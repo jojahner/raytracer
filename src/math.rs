@@ -11,8 +11,12 @@ macro_rules! assert_approx_eq {
     }};
 }
 
+mod matrix;
 mod point;
+mod tuple;
 mod vector;
 
 pub use self::point::Point;
+pub use self::tuple::Tuple;
 pub use self::vector::Vector;
+pub use self::matrix::Matrix;
