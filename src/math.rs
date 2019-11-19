@@ -19,4 +19,4 @@ mod vector;
 pub use self::point::Point;
 pub use self::tuple::Tuple;
 pub use self::vector::Vector;
-pub use self::matrix::Matrix;
+pub use self::matrix::{Matrix4x4, Matrix3x3, Matrix2x2};
