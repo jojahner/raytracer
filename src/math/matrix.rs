@@ -44,6 +44,100 @@ impl Matrix4x4 {
 
         result
     }
+
+    pub fn submatrix(&self, row_to_remove: usize, column_to_remove: usize) -> Matrix3x3 {
+        // TODO: figure out how this generic stuff works an then extract this!
+        let vec: Vec<Vec<f64>> = self
+            .data
+            .iter()
+            .enumerate()
+            .filter(|&(i, _)| i != row_to_remove)
+            .map(|(_, e)| {
+                e.iter()
+                    .enumerate()
+                    .filter(|&(i, _)| i != column_to_remove)
+                    .map(|(_, e)| *e)
+                    .collect()
+            })
+            .collect();
+
+        Matrix3x3 {
+            data: [
+                [vec[0][0], vec[0][1], vec[0][2]],
+                [vec[1][0], vec[1][1], vec[1][2]],
+                [vec[2][0], vec[2][1], vec[2][2]],
+            ],
+        }
+    }
+
+    pub fn minor(&self, row: usize, col: usize) -> f64 {
+        self.submatrix(row, col).determinant()
+    }
+
+    pub fn cofactor(&self, row: usize, col: usize) -> f64 {
+        if (row + col) % 2 == 0 {
+            self.minor(row, col)
+        } else {
+            -self.minor(row, col)
+        }
+    }
+
+    pub fn determinant(&self) -> f64 {
+        let mut det: f64 = 0.0;
+        for col in 0..=3 {
+            det += self[0][col] * self.cofactor(0, col)
+        }
+        det
+    }
+}
+
+impl Matrix3x3 {
+    pub fn submatrix(&self, row_to_remove: usize, column_to_remove: usize) -> Matrix2x2 {
+        // TODO: figure out how this generic stuff works an then extract this!
+        let vec: Vec<Vec<f64>> = self
+            .data
+            .iter()
+            .enumerate()
+            .filter(|&(i, _)| i != row_to_remove)
+            .map(|(_, e)| {
+                e.iter()
+                    .enumerate()
+                    .filter(|&(i, _)| i != column_to_remove)
+                    .map(|(_, e)| *e)
+                    .collect()
+            })
+            .collect();
+
+        Matrix2x2 {
+            data: [[vec[0][0], vec[0][1]], [vec[1][0], vec[1][1]]],
+        }
+    }
+
+    pub fn minor(&self, row: usize, col: usize) -> f64 {
+        self.submatrix(row, col).determinant()
+    }
+
+    pub fn cofactor(&self, row: usize, col: usize) -> f64 {
+        if (row + col) % 2 == 0 {
+            self.minor(row, col)
+        } else {
+            -self.minor(row, col)
+        }
+    }
+
+    pub fn determinant(&self) -> f64 {
+        let mut det: f64 = 0.0;
+        for col in 0..=2 {
+            det += self[0][col] * self.cofactor(0, col)
+        }
+        det
+    }
+}
+
+impl Matrix2x2 {
+    pub fn determinant(&self) -> f64 {
+        self[0][0] * self[1][1] - self[0][1] * self[1][0]
+    }
 }
 
 impl Index<usize> for Matrix4x4 {
@@ -263,10 +357,101 @@ mod test {
                 [9.0, 8.0, 8.0, 0.0],
                 [3.0, 0.0, 5.0, 5.0],
                 [0.0, 8.0, 3.0, 8.0],
-            ]
+            ],
         };
 
         assert_eq!(mat.transpose(), trans_mat);
         assert_eq!(Matrix4x4::identity().transpose(), Matrix4x4::identity());
+    }
+
+    #[test]
+    fn determinant_of_a_2_by_2_matrix() {
+        let mat = Matrix2x2 {
+            data: [[1.0, 5.0], [-3.0, 2.0]],
+        };
+
+        assert_approx_eq!(mat.determinant(), 17.0)
+    }
+
+    #[test]
+    fn submatrix_of_a_3_by_3_matrix() {
+        let mat = Matrix3x3 {
+            data: [[1.0, 5.0, 0.0], [-3.0, 2.0, 7.0], [0.0, 6.0, -3.0]],
+        };
+
+        let result = Matrix2x2 {
+            data: [[-3.0, 2.0], [0.0, 6.0]],
+        };
+
+        assert_eq!(mat.submatrix(0, 2), result)
+    }
+
+    #[test]
+    fn submatrix_of_a_4_by_4_matrix() {
+        let mat = Matrix4x4 {
+            data: [
+                [-6.0, 1.0, 1.0, 6.0],
+                [-8.0, 5.0, 8.0, 6.0],
+                [-1.0, 0.0, 8.0, 2.0],
+                [-7.0, 1.0, -1.0, 1.0],
+            ],
+        };
+
+        let result = Matrix3x3 {
+            data: [[-6.0, 1.0, 6.0], [-8.0, 8.0, 6.0], [-7.0, -1.0, 1.0]],
+        };
+
+        assert_eq!(mat.submatrix(2, 1), result)
+    }
+
+    #[test]
+    fn calculate_minor_for_3_by_3_matrix() {
+        let mat = Matrix3x3 {
+            data: [[3.0, 5.0, 0.0], [2.0, -1.0, -7.0], [6.0, -1.0, 5.0]],
+        };
+
+        assert_approx_eq!(mat.minor(1, 0), 25.0)
+    }
+
+    #[test]
+    fn cofactor_of_a_3_by_3_matrix() {
+        let mat = Matrix3x3 {
+            data: [[3.0, 5.0, 0.0], [2.0, -1.0, -7.0], [6.0, -1.0, 5.0]],
+        };
+
+        assert_approx_eq!(mat.cofactor(0, 0), -12.0);
+        assert_approx_eq!(mat.minor(0, 0), -12.0);
+        assert_approx_eq!(mat.cofactor(1, 0), -25.0);
+        assert_approx_eq!(mat.minor(1, 0), 25.0);
+    }
+
+    #[test]
+    fn determinant_of_a_3_by_3_matrix() {
+        let mat = Matrix3x3 {
+            data: [[1.0, 2.0, 6.0], [-5.0, 8.0, -4.0], [2.0, 6.0, 4.0]],
+        };
+
+        assert_approx_eq!(mat.cofactor(0, 0), 56.0);
+        assert_approx_eq!(mat.cofactor(0, 1), 12.0);
+        assert_approx_eq!(mat.cofactor(0, 2), -46.0);
+        assert_approx_eq!(mat.determinant(), -196.0);
+    }
+
+    #[test]
+    fn determinant_of_a_4_by_4_matrix() {
+        let mat = Matrix4x4 {
+            data: [
+                [-2.0, -8.0, 3.0, 5.0],
+                [-3.0, 1.0, 7.0, 3.0],
+                [1.0, 2.0, -9.0, 6.0],
+                [-6.0, 7.0, 7.0, -9.0],
+            ],
+        };
+
+        assert_approx_eq!(mat.cofactor(0, 0), 690.0);
+        assert_approx_eq!(mat.cofactor(0, 1), 447.0);
+        assert_approx_eq!(mat.cofactor(0, 2), 210.0);
+        assert_approx_eq!(mat.cofactor(0, 3), 51.0);
+        assert_approx_eq!(mat.determinant(), -4071.0);
     }
 }
