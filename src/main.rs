@@ -1,7 +1,6 @@
 use raytracer::math::{Point, Vector};
 use raytracer::{Canvas, Color};
 
-use std::error::Error;
 use std::fs::File;
 use std::io::prelude::*;
 
@@ -51,12 +50,12 @@ fn main() {
     let mut data = canvas.to_tga();
 
     let mut file = match File::create("output.tga") {
-        Err(why) => panic!("couldn't create output.tga: {}", why.description()),
+        Err(why) => panic!("couldn't create output.tga: {}", why.to_string()),
         Ok(file) => file,
     };
 
     match file.write_all(data.as_mut()) {
-        Err(why) => panic!("couldn't write to output.tga: {}", why.description()),
+        Err(why) => panic!("couldn't write to output.tga: {}", why.to_string()),
         Ok(_) => println!("successfully wrote to output.tga"),
     }
 }
