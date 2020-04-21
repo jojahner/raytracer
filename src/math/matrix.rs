@@ -89,6 +89,10 @@ impl Matrix4x4 {
         }
         det
     }
+
+    pub fn is_invertiable(&self) -> bool {
+        self.determinant() < 0.0
+    }
 }
 
 impl Matrix3x3 {
@@ -453,5 +457,33 @@ mod test {
         assert_approx_eq!(mat.cofactor(0, 2), 210.0);
         assert_approx_eq!(mat.cofactor(0, 3), 51.0);
         assert_approx_eq!(mat.determinant(), -4071.0);
+    }
+
+    #[test]
+    fn test_4_by_4_is_invertiable() {
+        let mat = Matrix4x4 {
+            data: [
+                [6.0, 4.0, 4.0, 4.0],
+                [5.0, 5.0, 7.0, 6.0],
+                [4.0, -9.0, 3.0, -7.0],
+                [9.0, 1.0, 7.0, -6.0]
+            ]
+        };
+        assert_approx_eq!(mat.determinant(), -2120.0);
+        assert_eq!(mat.is_invertiable(), true)
+    }
+
+    #[test]
+    fn test_4_by_4_is_not_invertiable() {
+        let mat = Matrix4x4 {
+            data: [
+                [-4.0, 2.0, -2.0, -3.0],
+                [9.0, 6.0, 2.0, 6.0],
+                [0.0, -5.0, 1.0, -5.0],
+                [0.0, 0.0, 0.0, 0.0]
+            ]
+        };
+        assert_approx_eq!(mat.determinant(), 0.0);
+        assert_eq!(mat.is_invertiable(), false)
     }
 }
