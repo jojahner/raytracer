@@ -15,6 +15,21 @@
               "build"
             ]
           }
-      }
+      },
+      {
+        "name": "(OSX) Run tests",
+        "type": "lldb",
+        "request": "launch",
+        "program": "${workspaceRoot}/target/debug/raytracer-75ab50792edfd2c3",
+        "args": [],
+        "cwd": "${workspaceRoot}",
+        "sourceLanguages": ["rust"],
+        "terminal": "console",
+        "cargo": {
+          "args": [
+            "build"
+          ]
+        }
+    }
   ]
 }
