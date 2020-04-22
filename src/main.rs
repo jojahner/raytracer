@@ -1,52 +1,29 @@
-use raytracer::math::{Point, Vector};
+use raytracer::math::{Point, Matrix4x4};
 use raytracer::{Canvas, Color};
 
 use std::fs::File;
 use std::io::prelude::*;
 
-#[derive(Copy, Clone, PartialEq, Debug)]
-struct Projectile {
-    position: Point,
-    velocity: Vector,
-}
-
-#[derive(Copy, Clone, PartialEq, Debug)]
-struct Environment {
-    gravity: Vector,
-    wind: Vector,
-}
-
-fn tick(projectile: Projectile, environment: Environment) -> Projectile {
-    let position = projectile.position + projectile.velocity;
-    let velocity = projectile.velocity + environment.gravity + environment.wind;
-
-    Projectile { position, velocity }
-}
-
 fn main() {
-    let mut projectile = Projectile {
-        position: Point::new(0.0, 1.0, 0.0),
-        velocity: Vector::new(1.0, 1.8, 0.0).normalize() * 11.25,
-    };
+    let mut canvas = Canvas::new(500, 500);
 
-    let environment = Environment {
-        gravity: Vector::new(0.0, -0.1, 0.0),
-        wind: Vector::new(-0.01, 0.0, 0.0),
-    };
+    let start = Point::new(0.0, 0.0, 1.0);
+    let radius = 200.0;
+    for hour in 1..=60 {
+        let rotation = Matrix4x4::rotation_y(hour as f64 * (std::f64::consts::PI / 30.0));
+        let point = rotation * start;
 
-    let mut canvas = Canvas::new(900, 550);
-
-    loop {
-        let x_pos = projectile.position.x as usize;
-        let y_pos = 550 - (projectile.position.y as usize);
-        canvas.write_pixel(x_pos, y_pos, Color::new(1.0, 0.0, 0.0));
-
-        projectile = tick(projectile, environment);
-
-        if projectile.position.y < 0.0 {
-            break;
+        let x_pos = (point.x * radius + 250.0) as usize;
+        let y_pos = (point.z * radius + 250.0) as usize;
+        if hour % 5 == 0 {
+            canvas.write_pixel(x_pos, y_pos, Color::new(1.0, 0.0, 0.0));
+        } else {
+            canvas.write_pixel(x_pos, y_pos, Color::new(1.0, 1.0, 1.0));
         }
     }
+
+    canvas.write_pixel(250, 250, Color::new(0.0, 1.0, 1.0));
+
     let mut data = canvas.to_tga();
 
     let mut file = match File::create("output.tga") {
