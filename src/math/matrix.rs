@@ -33,12 +33,23 @@ impl Matrix4x4 {
         }
     }
 
-    pub fn translation(x: f64, y: f64, z: f64) -> Matrix4x4 {
+    pub fn translate(x: f64, y: f64, z: f64) -> Matrix4x4 {
         Matrix4x4 {
             data: [
                 [1.0, 0.0, 0.0,   x],
                 [0.0, 1.0, 0.0,   y],
                 [0.0, 0.0, 1.0,   z],
+                [0.0, 0.0, 0.0, 1.0],
+            ],
+        }
+    }
+
+    pub fn scale(x: f64, y: f64, z: f64) -> Matrix4x4 {
+        Matrix4x4 {
+            data: [
+                [  x, 0.0, 0.0, 0.0],
+                [0.0,   y, 0.0, 0.0],
+                [0.0, 0.0,   z, 0.0],
                 [0.0, 0.0, 0.0, 1.0],
             ],
         }
@@ -589,7 +600,7 @@ mod test {
     #[test]
     fn multiply_by_a_tranformation_matrix() {
         let p = Point::new(-3.0, 4.0, 5.0);
-        let transform = Matrix4x4::translation(5.0, -3.0, 2.0);
+        let transform = Matrix4x4::translate(5.0, -3.0, 2.0);
 
         assert_eq!(transform * p, Point::new(2.0, 1.0, 7.0))
     }
@@ -597,7 +608,7 @@ mod test {
     #[test]
     fn multiply_by_a_the_inverse_of_a_tranformation_matrix() {
         let p = Point::new(-3.0, 4.0, 5.0);
-        let transform = Matrix4x4::translation(5.0, -3.0, 2.0).inverse().unwrap();
+        let transform = Matrix4x4::translate(5.0, -3.0, 2.0).inverse().unwrap();
 
         assert_eq!(transform * p, Point::new(-8.0, 7.0, 3.0))
     }
@@ -605,8 +616,33 @@ mod test {
     #[test]
     fn translation_does_not_affect_vectors() {
         let v = Vector::new(-3.0, 4.0, 5.0);
-        let transform = Matrix4x4::translation(5.0, -3.0, 2.0);
+        let transform = Matrix4x4::translate(5.0, -3.0, 2.0);
 
         assert_eq!(transform * v, v)
+    }
+
+    #[test]
+    fn scaling_applied_to_point() {
+        let transform = Matrix4x4::scale(2.0, 3.0, 4.0);
+        let p = Point::new(-4.0, 6.0, 8.0);
+
+        assert_eq!(transform * p, Point::new(-8.0, 18.0, 32.0))
+    }
+
+    #[test]
+    fn scaling_applied_to_vector() {
+        let transform = Matrix4x4::scale(2.0, 3.0, 4.0);
+        let v = Vector::new(-4.0, 6.0, 8.0);
+
+        assert_eq!(transform * v, Vector::new(-8.0, 18.0, 32.0))
+    }
+
+    #[test]
+    fn multiply_by_the_inverse_of_a_scaling_matrix() {
+        let transform = Matrix4x4::scale(2.0, 3.0, 4.0);
+        let inv = transform.inverse().unwrap();
+        let v = Vector::new(-4.0, 6.0, 8.0);
+
+        assert_eq!(inv * v, Vector::new(-2.0, 2.0, 2.0))
     }
 }
