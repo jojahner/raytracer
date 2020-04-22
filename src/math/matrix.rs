@@ -4,6 +4,7 @@ use std::ops::Mul;
 
 use crate::math::Point;
 use crate::math::Tuple;
+use crate::math::Vector;
 
 #[derive(Copy, Clone, Debug, PartialEq)]
 pub struct Matrix4x4 {
@@ -27,6 +28,17 @@ impl Matrix4x4 {
                 [1.0, 0.0, 0.0, 0.0],
                 [0.0, 1.0, 0.0, 0.0],
                 [0.0, 0.0, 1.0, 0.0],
+                [0.0, 0.0, 0.0, 1.0],
+            ],
+        }
+    }
+
+    pub fn translation(x: f64, y: f64, z: f64) -> Matrix4x4 {
+        Matrix4x4 {
+            data: [
+                [1.0, 0.0, 0.0,   x],
+                [0.0, 1.0, 0.0,   y],
+                [0.0, 0.0, 1.0,   z],
                 [0.0, 0.0, 0.0, 1.0],
             ],
         }
@@ -116,53 +128,6 @@ impl Matrix4x4 {
             ],
         })
     }
-
-    // pub fn inverse2(&self) -> Matrix4x4 {
-    //     let s0 = self.data[0][0] * self.data[1][1] - self.data[1][0] * self.data[0][1];
-    //     let s1 = self.data[0][0] * self.data[1][2] - self.data[1][0] * self.data[0][2];
-    //     let s2 = self.data[0][0] * self.data[1][3] - self.data[1][0] * self.data[0][3];
-    //     let s3 = self.data[0][1] * self.data[1][2] - self.data[1][1] * self.data[0][2];
-    //     let s4 = self.data[0][1] * self.data[1][3] - self.data[1][1] * self.data[0][3];
-    //     let s5 = self.data[0][2] * self.data[1][3] - self.data[1][2] * self.data[0][3];
-
-    //     let c5 = self.data[2][2] * self.data[3][3] - self.data[3][2] * self.data[2][3];
-    //     let c4 = self.data[2][1] * self.data[3][3] - self.data[3][1] * self.data[2][3];
-    //     let c3 = self.data[2][1] * self.data[3][2] - self.data[3][1] * self.data[2][2];
-    //     let c2 = self.data[2][0] * self.data[3][3] - self.data[3][0] * self.data[2][3];
-    //     let c1 = self.data[2][0] * self.data[3][2] - self.data[3][0] * self.data[2][2];
-    //     let c0 = self.data[2][0] * self.data[3][1] - self.data[3][0] * self.data[2][1];
-
-    //     let invdet = 1.0 / (s0 * c5 - s1 * c4 + s2 * c3 + s3 * c2 - s4 * c1 + s5 * c0);
-
-    //     let mut data = [[0.0, 0.0, 0.0, 0.0],
-    //                  [0.0, 0.0, 0.0, 0.0],
-    //                  [0.0, 0.0, 0.0, 0.0],
-    //                  [0.0, 0.0, 0.0, 0.0]];
-
-    //     let a = self.data;
-
-    //     data[0][0] = ( a[1][1] * c5 - a[1][2] * c4 + a[1][3] * c3) * invdet;
-    //     data[0][1] = (-a[0][1] * c5 + a[0][2] * c4 - a[0][3] * c3) * invdet;
-    //     data[0][2] = ( a[3][1] * s5 - a[3][2] * s4 + a[3][3] * s3) * invdet;
-    //     data[0][3] = (-a[2][1] * s5 + a[2][2] * s4 - a[2][3] * s3) * invdet;
-
-    //     data[1][0] = (-a[1][0] * c5 + a[1][2] * c2 - a[1][3] * c1) * invdet;
-    //     data[1][1] = ( a[0][0] * c5 - a[0][2] * c2 + a[0][3] * c1) * invdet;
-    //     data[1][2] = (-a[3][0] * s5 + a[3][2] * s2 - a[3][3] * s1) * invdet;
-    //     data[1][3] = ( a[2][0] * s5 - a[2][2] * s2 + a[2][3] * s1) * invdet;
-
-    //     data[2][0] = ( a[1][0] * c4 - a[1][1] * c2 + a[1][3] * c0) * invdet;
-    //     data[2][1] = (-a[0][0] * c4 + a[0][1] * c2 - a[0][3] * c0) * invdet;
-    //     data[2][2] = ( a[3][0] * s4 - a[3][1] * s2 + a[3][3] * s0) * invdet;
-    //     data[2][3] = (-a[2][0] * s4 + a[2][1] * s2 - a[2][3] * s0) * invdet;
-
-    //     data[3][0] = (-a[1][0] * c3 + a[1][1] * c1 - a[1][2] * c0) * invdet;
-    //     data[3][1] = ( a[0][0] * c3 - a[0][1] * c1 + a[0][2] * c0) * invdet;
-    //     data[3][2] = (-a[3][0] * s3 + a[3][1] * s1 - a[3][2] * s0) * invdet;
-    //     data[3][3] = ( a[2][0] * s3 - a[2][1] * s1 + a[2][2] * s0) * invdet;
-
-    //     Matrix4x4 { data }
-    // }
 }
 
 impl Matrix3x3 {
@@ -296,6 +261,18 @@ impl Mul<Point> for Matrix4x4 {
             self[0][0] * other.x + self[0][1] * other.y + self[0][2] * other.z + self[0][3],
             self[1][0] * other.x + self[1][1] * other.y + self[1][2] * other.z + self[1][3],
             self[2][0] * other.x + self[2][1] * other.y + self[2][2] * other.z + self[2][3],
+        )
+    }
+}
+
+impl Mul<Vector> for Matrix4x4 {
+    type Output = Vector;
+
+    fn mul(self, other: Self::Output) -> Self::Output {
+        Vector::new(
+            self[0][0] * other.x + self[0][1] * other.y + self[0][2] * other.z,
+            self[1][0] * other.x + self[1][1] * other.y + self[1][2] * other.z,
+            self[2][0] * other.x + self[2][1] * other.y + self[2][2] * other.z,
         )
     }
 }
@@ -652,5 +629,29 @@ mod test {
         let mat_c = mat_a * mat_b;
 
         assert_approx_4_by_4_eq!(mat_c * mat_b.inverse().unwrap(), mat_a);
+    }
+
+    #[test]
+    fn multiply_by_a_tranformation_matrix() {
+        let p = Point::new(-3.0, 4.0, 5.0);
+        let transform = Matrix4x4::translation(5.0, -3.0, 2.0);
+
+        assert_eq!(transform * p, Point::new(2.0, 1.0, 7.0))
+    }
+
+    #[test]
+    fn multiply_by_a_the_inverse_of_a_tranformation_matrix() {
+        let p = Point::new(-3.0, 4.0, 5.0);
+        let transform = Matrix4x4::translation(5.0, -3.0, 2.0).inverse().unwrap();
+
+        assert_eq!(transform * p, Point::new(-8.0, 7.0, 3.0))
+    }
+
+    #[test]
+    fn translation_does_not_affect_vectors() {
+        let v = Vector::new(-3.0, 4.0, 5.0);
+        let transform = Matrix4x4::translation(5.0, -3.0, 2.0);
+
+        assert_eq!(transform * v, v)
     }
 }
