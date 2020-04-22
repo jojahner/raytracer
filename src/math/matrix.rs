@@ -88,6 +88,17 @@ impl Matrix4x4 {
         }
     }
 
+    pub fn shear(x_y: f64, x_z: f64, y_x: f64, y_z: f64, z_x: f64, z_y: f64) -> Matrix4x4 {
+        Matrix4x4 {
+            data: [
+                [1.0, x_y, x_z, 0.0],
+                [y_x, 1.0, y_z, 0.0],
+                [z_x, z_y, 1.0, 0.0],
+                [0.0, 0.0, 0.0, 1.0],
+            ],
+        }
+    }
+
     pub fn transpose(&self) -> Matrix4x4 {
         let mut result = Matrix4x4::identity();
 
@@ -716,5 +727,53 @@ mod test {
 
         assert_eq!(half_quarter * p, Point::new(-(2.0_f64.sqrt()) / 2.0, 2.0_f64.sqrt() / 2.0, 0.0));
         assert_eq!(full_quarter * p, Point::new(-1.0, 0.0, 0.0));
+    }
+
+    #[test]
+    fn a_shearing_transformation_moves_x_in_proportion_to_y() {
+        let transform = Matrix4x4::shear(1.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+        let p = Point::new(2.0, 3.0, 4.0);
+
+        assert_eq!(transform * p, Point::new(5.0, 3.0, 4.0))
+    }
+
+    #[test]
+    fn a_shearing_transformation_moves_x_in_proportion_to_z() {
+        let transform = Matrix4x4::shear(0.0, 1.0, 0.0, 0.0, 0.0, 0.0);
+        let p = Point::new(2.0, 3.0, 4.0);
+
+        assert_eq!(transform * p, Point::new(6.0, 3.0, 4.0))
+    }
+
+    #[test]
+    fn a_shearing_transformation_moves_y_in_proportion_to_x() {
+        let transform = Matrix4x4::shear(0.0, 0.0, 1.0, 0.0, 0.0, 0.0);
+        let p = Point::new(2.0, 3.0, 4.0);
+
+        assert_eq!(transform * p, Point::new(2.0, 5.0, 4.0))
+    }
+
+    #[test]
+    fn a_shearing_transformation_moves_y_in_proportion_to_z() {
+        let transform = Matrix4x4::shear(0.0, 0.0, 0.0, 1.0, 0.0, 0.0);
+        let p = Point::new(2.0, 3.0, 4.0);
+
+        assert_eq!(transform * p, Point::new(2.0, 7.0, 4.0))
+    }
+
+    #[test]
+    fn a_shearing_transformation_moves_z_in_proportion_to_x() {
+        let transform = Matrix4x4::shear(0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+        let p = Point::new(2.0, 3.0, 4.0);
+
+        assert_eq!(transform * p, Point::new(2.0, 3.0, 6.0))
+    }
+
+    #[test]
+    fn a_shearing_transformation_moves_z_in_proportion_to_y() {
+        let transform = Matrix4x4::shear(0.0, 0.0, 0.0, 0.0, 0.0, 1.0);
+        let p = Point::new(2.0, 3.0, 4.0);
+
+        assert_eq!(transform * p, Point::new(2.0, 3.0, 7.0))
     }
 }
