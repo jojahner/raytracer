@@ -33,7 +33,7 @@ impl Matrix4x4 {
         }
     }
 
-    pub fn translate(x: f64, y: f64, z: f64) -> Matrix4x4 {
+    pub fn translation(x: f64, y: f64, z: f64) -> Matrix4x4 {
         Matrix4x4 {
             data: [
                 [1.0, 0.0, 0.0,   x],
@@ -44,7 +44,7 @@ impl Matrix4x4 {
         }
     }
 
-    pub fn scale(x: f64, y: f64, z: f64) -> Matrix4x4 {
+    pub fn scaling(x: f64, y: f64, z: f64) -> Matrix4x4 {
         Matrix4x4 {
             data: [
                 [  x, 0.0, 0.0, 0.0],
@@ -55,7 +55,7 @@ impl Matrix4x4 {
         }
     }
 
-    pub fn rotate_x(r: f64) -> Matrix4x4 {
+    pub fn rotation_x(r: f64) -> Matrix4x4 {
         Matrix4x4 {
             data: [
                 [1.0,     0.0,      0.0, 0.0],
@@ -66,7 +66,7 @@ impl Matrix4x4 {
         }
     }
 
-    pub fn rotate_y(r: f64) -> Matrix4x4 {
+    pub fn rotation_y(r: f64) -> Matrix4x4 {
         Matrix4x4 {
             data: [
                 [ r.cos(), 0.0,  r.sin(), 0.0],
@@ -77,7 +77,7 @@ impl Matrix4x4 {
         }
     }
 
-    pub fn rotate_z(r: f64) -> Matrix4x4 {
+    pub fn rotation_z(r: f64) -> Matrix4x4 {
         Matrix4x4 {
             data: [
                 [r.cos(), -r.sin(), 0.0, 0.0],
@@ -88,7 +88,7 @@ impl Matrix4x4 {
         }
     }
 
-    pub fn shear(x_y: f64, x_z: f64, y_x: f64, y_z: f64, z_x: f64, z_y: f64) -> Matrix4x4 {
+    pub fn skewing(x_y: f64, x_z: f64, y_x: f64, y_z: f64, z_x: f64, z_y: f64) -> Matrix4x4 {
         Matrix4x4 {
             data: [
                 [1.0, x_y, x_z, 0.0],
@@ -182,6 +182,30 @@ impl Matrix4x4 {
                 [data[3][0], data[3][1], data[3][2], data[3][3]],
             ],
         })
+    }
+
+    pub fn translate(&self, x: f64, y: f64, z: f64) -> Matrix4x4 {
+        Matrix4x4::translation(x, y, z) * *self
+    }
+
+    pub fn scale(&self, x: f64, y: f64, z: f64) -> Matrix4x4 {
+        Matrix4x4::scaling(x, y, z) * *self
+    }
+
+    pub fn skew(&self, x_y: f64, x_z: f64, y_x: f64, y_z: f64, z_x: f64, z_y: f64) -> Matrix4x4 {
+        Matrix4x4::skewing(x_y, x_z, y_x, y_z, z_x, z_y) * *self
+    }
+
+    pub fn rotate_x(&self, r: f64) -> Matrix4x4 {
+        Matrix4x4::rotation_x(r) * *self
+    }
+
+    pub fn rotate_y(&self, r: f64) -> Matrix4x4 {
+        Matrix4x4::rotation_y(r) * *self
+    }
+
+    pub fn rotate_z(&self, r: f64) -> Matrix4x4 {
+        Matrix4x4::rotation_z(r) * *self
     }
 }
 
@@ -644,7 +668,7 @@ mod test {
     #[test]
     fn multiply_by_a_tranformation_matrix() {
         let p = Point::new(-3.0, 4.0, 5.0);
-        let transform = Matrix4x4::translate(5.0, -3.0, 2.0);
+        let transform = Matrix4x4::translation(5.0, -3.0, 2.0);
 
         assert_eq!(transform * p, Point::new(2.0, 1.0, 7.0))
     }
@@ -652,7 +676,7 @@ mod test {
     #[test]
     fn multiply_by_a_the_inverse_of_a_tranformation_matrix() {
         let p = Point::new(-3.0, 4.0, 5.0);
-        let transform = Matrix4x4::translate(5.0, -3.0, 2.0).inverse().unwrap();
+        let transform = Matrix4x4::translation(5.0, -3.0, 2.0).inverse().unwrap();
 
         assert_eq!(transform * p, Point::new(-8.0, 7.0, 3.0))
     }
@@ -660,14 +684,14 @@ mod test {
     #[test]
     fn translation_does_not_affect_vectors() {
         let v = Vector::new(-3.0, 4.0, 5.0);
-        let transform = Matrix4x4::translate(5.0, -3.0, 2.0);
+        let transform = Matrix4x4::translation(5.0, -3.0, 2.0);
 
         assert_eq!(transform * v, v)
     }
 
     #[test]
     fn scaling_applied_to_point() {
-        let transform = Matrix4x4::scale(2.0, 3.0, 4.0);
+        let transform = Matrix4x4::scaling(2.0, 3.0, 4.0);
         let p = Point::new(-4.0, 6.0, 8.0);
 
         assert_eq!(transform * p, Point::new(-8.0, 18.0, 32.0))
@@ -675,7 +699,7 @@ mod test {
 
     #[test]
     fn scaling_applied_to_vector() {
-        let transform = Matrix4x4::scale(2.0, 3.0, 4.0);
+        let transform = Matrix4x4::scaling(2.0, 3.0, 4.0);
         let v = Vector::new(-4.0, 6.0, 8.0);
 
         assert_eq!(transform * v, Vector::new(-8.0, 18.0, 32.0))
@@ -683,7 +707,7 @@ mod test {
 
     #[test]
     fn multiply_by_the_inverse_of_a_scaling_matrix() {
-        let transform = Matrix4x4::scale(2.0, 3.0, 4.0);
+        let transform = Matrix4x4::scaling(2.0, 3.0, 4.0);
         let inv = transform.inverse().unwrap();
         let v = Vector::new(-4.0, 6.0, 8.0);
 
@@ -693,8 +717,8 @@ mod test {
     #[test]
     fn rotating_a_point_around_the_x_axis() {
         let p = Point::new(0.0, 1.0, 0.0);
-        let half_quarter = Matrix4x4::rotate_x(std::f64::consts::PI / 4.0);
-        let full_quarter = Matrix4x4::rotate_x(std::f64::consts::PI / 2.0);
+        let half_quarter = Matrix4x4::rotation_x(std::f64::consts::PI / 4.0);
+        let full_quarter = Matrix4x4::rotation_x(std::f64::consts::PI / 2.0);
 
         assert_eq!(half_quarter * p, Point::new(0.0, 2.0_f64.sqrt() / 2.0, 2.0_f64.sqrt() / 2.0));
         assert_eq!(full_quarter * p, Point::new(0.0, 0.0, 1.0));
@@ -703,7 +727,7 @@ mod test {
     #[test]
     fn the_inverse_of_an_x_rotation_rotates_in_the_opposite_direction() {
         let p = Point::new(0.0, 1.0, 0.0);
-        let half_quarter = Matrix4x4::rotate_x(std::f64::consts::PI / 4.0);
+        let half_quarter = Matrix4x4::rotation_x(std::f64::consts::PI / 4.0);
         let inv = half_quarter.inverse().unwrap();
 
         assert_eq!(inv * p, Point::new(0.0, 2.0_f64.sqrt() / 2.0, -(2.0_f64.sqrt()) / 2.0));
@@ -712,8 +736,8 @@ mod test {
     #[test]
     fn rotating_a_point_around_the_y_axis() {
         let p = Point::new(0.0, 0.0, 1.0);
-        let half_quarter = Matrix4x4::rotate_y(std::f64::consts::PI / 4.0);
-        let full_quarter = Matrix4x4::rotate_y(std::f64::consts::PI / 2.0);
+        let half_quarter = Matrix4x4::rotation_y(std::f64::consts::PI / 4.0);
+        let full_quarter = Matrix4x4::rotation_y(std::f64::consts::PI / 2.0);
 
         assert_eq!(half_quarter * p, Point::new(2.0_f64.sqrt() / 2.0, 0.0, 2.0_f64.sqrt() / 2.0));
         assert_eq!(full_quarter * p, Point::new(1.0, 0.0, 0.0));
@@ -722,8 +746,8 @@ mod test {
     #[test]
     fn rotating_a_point_around_the_z_axis() {
         let p = Point::new(0.0, 1.0, 0.0);
-        let half_quarter = Matrix4x4::rotate_z(std::f64::consts::PI / 4.0);
-        let full_quarter = Matrix4x4::rotate_z(std::f64::consts::PI / 2.0);
+        let half_quarter = Matrix4x4::rotation_z(std::f64::consts::PI / 4.0);
+        let full_quarter = Matrix4x4::rotation_z(std::f64::consts::PI / 2.0);
 
         assert_eq!(half_quarter * p, Point::new(-(2.0_f64.sqrt()) / 2.0, 2.0_f64.sqrt() / 2.0, 0.0));
         assert_eq!(full_quarter * p, Point::new(-1.0, 0.0, 0.0));
@@ -731,7 +755,7 @@ mod test {
 
     #[test]
     fn a_shearing_transformation_moves_x_in_proportion_to_y() {
-        let transform = Matrix4x4::shear(1.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+        let transform = Matrix4x4::skewing(1.0, 0.0, 0.0, 0.0, 0.0, 0.0);
         let p = Point::new(2.0, 3.0, 4.0);
 
         assert_eq!(transform * p, Point::new(5.0, 3.0, 4.0))
@@ -739,7 +763,7 @@ mod test {
 
     #[test]
     fn a_shearing_transformation_moves_x_in_proportion_to_z() {
-        let transform = Matrix4x4::shear(0.0, 1.0, 0.0, 0.0, 0.0, 0.0);
+        let transform = Matrix4x4::skewing(0.0, 1.0, 0.0, 0.0, 0.0, 0.0);
         let p = Point::new(2.0, 3.0, 4.0);
 
         assert_eq!(transform * p, Point::new(6.0, 3.0, 4.0))
@@ -747,7 +771,7 @@ mod test {
 
     #[test]
     fn a_shearing_transformation_moves_y_in_proportion_to_x() {
-        let transform = Matrix4x4::shear(0.0, 0.0, 1.0, 0.0, 0.0, 0.0);
+        let transform = Matrix4x4::skewing(0.0, 0.0, 1.0, 0.0, 0.0, 0.0);
         let p = Point::new(2.0, 3.0, 4.0);
 
         assert_eq!(transform * p, Point::new(2.0, 5.0, 4.0))
@@ -755,7 +779,7 @@ mod test {
 
     #[test]
     fn a_shearing_transformation_moves_y_in_proportion_to_z() {
-        let transform = Matrix4x4::shear(0.0, 0.0, 0.0, 1.0, 0.0, 0.0);
+        let transform = Matrix4x4::skewing(0.0, 0.0, 0.0, 1.0, 0.0, 0.0);
         let p = Point::new(2.0, 3.0, 4.0);
 
         assert_eq!(transform * p, Point::new(2.0, 7.0, 4.0))
@@ -763,7 +787,7 @@ mod test {
 
     #[test]
     fn a_shearing_transformation_moves_z_in_proportion_to_x() {
-        let transform = Matrix4x4::shear(0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+        let transform = Matrix4x4::skewing(0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
         let p = Point::new(2.0, 3.0, 4.0);
 
         assert_eq!(transform * p, Point::new(2.0, 3.0, 6.0))
@@ -771,9 +795,20 @@ mod test {
 
     #[test]
     fn a_shearing_transformation_moves_z_in_proportion_to_y() {
-        let transform = Matrix4x4::shear(0.0, 0.0, 0.0, 0.0, 0.0, 1.0);
+        let transform = Matrix4x4::skewing(0.0, 0.0, 0.0, 0.0, 0.0, 1.0);
         let p = Point::new(2.0, 3.0, 4.0);
 
         assert_eq!(transform * p, Point::new(2.0, 3.0, 7.0))
+    }
+
+    #[test]
+    fn individual_transformations_are_applied_in_sequence() {
+        let p = Point::new(1.0, 0.0, 1.0);
+        let transform = Matrix4x4::identity()
+                                  .rotate_x(std::f64::consts::PI / 2.0)
+                                  .scale(5.0, 5.0, 5.0)
+                                  .translate(10.0, 5.0, 7.0);
+
+        assert_eq!(transform * p, Point::new(15.0, 0.0, 7.0))
     }
 }
