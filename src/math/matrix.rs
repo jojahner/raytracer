@@ -282,48 +282,6 @@ mod test {
     use super::*;
 
     #[test]
-    fn index_accessfor_4_by_4() {
-        let mat = Matrix4x4 {
-            data: [
-                [1.0, 2.0, 3.0, 4.0],
-                [5.5, 6.7, 7.5, 8.5],
-                [9.0, 10.0, 11.0, 12.0],
-                [13.5, 14.5, 15.5, 16.5],
-            ],
-        };
-
-        assert_approx_eq!(mat[0][0], 1.0);
-        assert_approx_eq!(mat[0][3], 4.0);
-        assert_approx_eq!(mat[1][0], 5.5);
-        assert_approx_eq!(mat[2][2], 11.0);
-        assert_approx_eq!(mat[3][0], 13.5);
-        assert_approx_eq!(mat[3][2], 15.5);
-    }
-
-    #[test]
-    fn index_accessfor_3_by_3() {
-        let mat = Matrix3x3 {
-            data: [[-3.0, 5.0, 0.0], [1.0, -2.0, -7.0], [0.0, 1.0, 1.0]],
-        };
-
-        assert_approx_eq!(mat[0][0], -3.0);
-        assert_approx_eq!(mat[1][1], -2.0);
-        assert_approx_eq!(mat[2][2], 1.0);
-    }
-
-    #[test]
-    fn index_accessfor_2_by_2() {
-        let mat = Matrix2x2 {
-            data: [[-3.0, 5.0], [1.0, -2.0]],
-        };
-
-        assert_approx_eq!(mat[0][0], -3.0);
-        assert_approx_eq!(mat[0][1], 5.0);
-        assert_approx_eq!(mat[1][0], 1.0);
-        assert_approx_eq!(mat[1][1], -2.0);
-    }
-
-    #[test]
     fn multiply_two_matrices() {
         let mat_a = Matrix4x4 {
             data: [
@@ -562,11 +520,8 @@ mod test {
         assert_approx_eq!(mat.cofactor(3, 2), 105.0);
         assert_approx_eq!(inverse.data[2][3], 105.0/532.0);
 
-        assert_approx_4_by_4_eq!(inverse, inverted_mat)
-    }
+        assert_approx_4_by_4_eq!(inverse, inverted_mat);
 
-    #[test]
-    fn another_inverse_of_4_by_4_matrix() {
         let mat_a = Matrix4x4 {
             data: [
                 [ 8.0, -5.0,  9.0,  2.0],
