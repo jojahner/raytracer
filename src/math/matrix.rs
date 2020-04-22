@@ -51,7 +51,40 @@ impl Matrix4x4 {
                 [0.0,   y, 0.0, 0.0],
                 [0.0, 0.0,   z, 0.0],
                 [0.0, 0.0, 0.0, 1.0],
-            ],
+            ]
+        }
+    }
+
+    pub fn rotate_x(r: f64) -> Matrix4x4 {
+        Matrix4x4 {
+            data: [
+                [1.0,     0.0,      0.0, 0.0],
+                [0.0, r.cos(), -r.sin(), 0.0],
+                [0.0, r.sin(), r.cos(), 0.0],
+                [0.0,     0.0,      0.0, 1.0],
+            ]
+        }
+    }
+
+    pub fn rotate_y(r: f64) -> Matrix4x4 {
+        Matrix4x4 {
+            data: [
+                [ r.cos(), 0.0,  r.sin(), 0.0],
+                [     0.0, 1.0,      0.0, 0.0],
+                [-r.sin(), 0.0,  r.cos(), 0.0],
+                [     0.0, 0.0,      0.0, 1.0],
+            ]
+        }
+    }
+
+    pub fn rotate_z(r: f64) -> Matrix4x4 {
+        Matrix4x4 {
+            data: [
+                [r.cos(), -r.sin(), 0.0, 0.0],
+                [r.sin(),  r.cos(), 0.0, 0.0],
+                [    0.0,      0.0, 1.0, 0.0],
+                [    0.0,      0.0, 0.0, 1.0],
+            ]
         }
     }
 
@@ -644,5 +677,44 @@ mod test {
         let v = Vector::new(-4.0, 6.0, 8.0);
 
         assert_eq!(inv * v, Vector::new(-2.0, 2.0, 2.0))
+    }
+
+    #[test]
+    fn rotating_a_point_around_the_x_axis() {
+        let p = Point::new(0.0, 1.0, 0.0);
+        let half_quarter = Matrix4x4::rotate_x(std::f64::consts::PI / 4.0);
+        let full_quarter = Matrix4x4::rotate_x(std::f64::consts::PI / 2.0);
+
+        assert_eq!(half_quarter * p, Point::new(0.0, 2.0_f64.sqrt() / 2.0, 2.0_f64.sqrt() / 2.0));
+        assert_eq!(full_quarter * p, Point::new(0.0, 0.0, 1.0));
+    }
+
+    #[test]
+    fn the_inverse_of_an_x_rotation_rotates_in_the_opposite_direction() {
+        let p = Point::new(0.0, 1.0, 0.0);
+        let half_quarter = Matrix4x4::rotate_x(std::f64::consts::PI / 4.0);
+        let inv = half_quarter.inverse().unwrap();
+
+        assert_eq!(inv * p, Point::new(0.0, 2.0_f64.sqrt() / 2.0, -(2.0_f64.sqrt()) / 2.0));
+    }
+
+    #[test]
+    fn rotating_a_point_around_the_y_axis() {
+        let p = Point::new(0.0, 0.0, 1.0);
+        let half_quarter = Matrix4x4::rotate_y(std::f64::consts::PI / 4.0);
+        let full_quarter = Matrix4x4::rotate_y(std::f64::consts::PI / 2.0);
+
+        assert_eq!(half_quarter * p, Point::new(2.0_f64.sqrt() / 2.0, 0.0, 2.0_f64.sqrt() / 2.0));
+        assert_eq!(full_quarter * p, Point::new(1.0, 0.0, 0.0));
+    }
+
+    #[test]
+    fn rotating_a_point_around_the_z_axis() {
+        let p = Point::new(0.0, 1.0, 0.0);
+        let half_quarter = Matrix4x4::rotate_z(std::f64::consts::PI / 4.0);
+        let full_quarter = Matrix4x4::rotate_z(std::f64::consts::PI / 2.0);
+
+        assert_eq!(half_quarter * p, Point::new(-(2.0_f64.sqrt()) / 2.0, 2.0_f64.sqrt() / 2.0, 0.0));
+        assert_eq!(full_quarter * p, Point::new(-1.0, 0.0, 0.0));
     }
 }
