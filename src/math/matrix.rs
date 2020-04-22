@@ -91,8 +91,78 @@ impl Matrix4x4 {
     }
 
     pub fn is_invertiable(&self) -> bool {
-        self.determinant() < 0.0
+        self.determinant() != 0.0
     }
+
+    pub fn inverse(&self) -> Option<Matrix4x4> {
+        let mut data: [[f64; 4]; 4] = [[0.0; 4]; 4];
+        let det = self.determinant();
+
+        if det == 0.0 { return None; }
+
+        for row in 0..=3 {
+            for col in 0..=3 {
+                let c = self.cofactor(row, col);
+                data[col][row] = c / det;
+            }
+        }
+
+        Some(Matrix4x4 {
+            data: [
+                [data[0][0], data[0][1], data[0][2], data[0][3]],
+                [data[1][0], data[1][1], data[1][2], data[1][3]],
+                [data[2][0], data[2][1], data[2][2], data[2][3]],
+                [data[3][0], data[3][1], data[3][2], data[3][3]],
+            ],
+        })
+    }
+
+    // pub fn inverse2(&self) -> Matrix4x4 {
+    //     let s0 = self.data[0][0] * self.data[1][1] - self.data[1][0] * self.data[0][1];
+    //     let s1 = self.data[0][0] * self.data[1][2] - self.data[1][0] * self.data[0][2];
+    //     let s2 = self.data[0][0] * self.data[1][3] - self.data[1][0] * self.data[0][3];
+    //     let s3 = self.data[0][1] * self.data[1][2] - self.data[1][1] * self.data[0][2];
+    //     let s4 = self.data[0][1] * self.data[1][3] - self.data[1][1] * self.data[0][3];
+    //     let s5 = self.data[0][2] * self.data[1][3] - self.data[1][2] * self.data[0][3];
+
+    //     let c5 = self.data[2][2] * self.data[3][3] - self.data[3][2] * self.data[2][3];
+    //     let c4 = self.data[2][1] * self.data[3][3] - self.data[3][1] * self.data[2][3];
+    //     let c3 = self.data[2][1] * self.data[3][2] - self.data[3][1] * self.data[2][2];
+    //     let c2 = self.data[2][0] * self.data[3][3] - self.data[3][0] * self.data[2][3];
+    //     let c1 = self.data[2][0] * self.data[3][2] - self.data[3][0] * self.data[2][2];
+    //     let c0 = self.data[2][0] * self.data[3][1] - self.data[3][0] * self.data[2][1];
+
+    //     let invdet = 1.0 / (s0 * c5 - s1 * c4 + s2 * c3 + s3 * c2 - s4 * c1 + s5 * c0);
+
+    //     let mut data = [[0.0, 0.0, 0.0, 0.0],
+    //                  [0.0, 0.0, 0.0, 0.0],
+    //                  [0.0, 0.0, 0.0, 0.0],
+    //                  [0.0, 0.0, 0.0, 0.0]];
+
+    //     let a = self.data;
+
+    //     data[0][0] = ( a[1][1] * c5 - a[1][2] * c4 + a[1][3] * c3) * invdet;
+    //     data[0][1] = (-a[0][1] * c5 + a[0][2] * c4 - a[0][3] * c3) * invdet;
+    //     data[0][2] = ( a[3][1] * s5 - a[3][2] * s4 + a[3][3] * s3) * invdet;
+    //     data[0][3] = (-a[2][1] * s5 + a[2][2] * s4 - a[2][3] * s3) * invdet;
+
+    //     data[1][0] = (-a[1][0] * c5 + a[1][2] * c2 - a[1][3] * c1) * invdet;
+    //     data[1][1] = ( a[0][0] * c5 - a[0][2] * c2 + a[0][3] * c1) * invdet;
+    //     data[1][2] = (-a[3][0] * s5 + a[3][2] * s2 - a[3][3] * s1) * invdet;
+    //     data[1][3] = ( a[2][0] * s5 - a[2][2] * s2 + a[2][3] * s1) * invdet;
+
+    //     data[2][0] = ( a[1][0] * c4 - a[1][1] * c2 + a[1][3] * c0) * invdet;
+    //     data[2][1] = (-a[0][0] * c4 + a[0][1] * c2 - a[0][3] * c0) * invdet;
+    //     data[2][2] = ( a[3][0] * s4 - a[3][1] * s2 + a[3][3] * s0) * invdet;
+    //     data[2][3] = (-a[2][0] * s4 + a[2][1] * s2 - a[2][3] * s0) * invdet;
+
+    //     data[3][0] = (-a[1][0] * c3 + a[1][1] * c1 - a[1][2] * c0) * invdet;
+    //     data[3][1] = ( a[0][0] * c3 - a[0][1] * c1 + a[0][2] * c0) * invdet;
+    //     data[3][2] = (-a[3][0] * s3 + a[3][1] * s1 - a[3][2] * s0) * invdet;
+    //     data[3][3] = ( a[2][0] * s3 - a[2][1] * s1 + a[2][2] * s0) * invdet;
+
+    //     Matrix4x4 { data }
+    // }
 }
 
 impl Matrix3x3 {
@@ -485,5 +555,102 @@ mod test {
         };
         assert_approx_eq!(mat.determinant(), 0.0);
         assert_eq!(mat.is_invertiable(), false)
+    }
+
+    #[test]
+    fn inverse_of_4_by_4_matrix() {
+        let mat = Matrix4x4 {
+            data: [
+                [-5.0, 2.0, 6.0, -8.0],
+                [1.0, -5.0, 1.0, 8.0],
+                [7.0, 7.0, -6.0, -7.0],
+                [1.0, -3.0, 7.0, 4.0]
+            ]
+        };
+
+        let inverted_mat = Matrix4x4 {
+            data: [
+                [0.21805, 0.45113, 0.24060, -0.04511],
+                [-0.80827, -1.45677, -0.44361, 0.52068],
+                [-0.07895, -0.22368, -0.05263, 0.19737],
+                [-0.52256, -0.81391, -0.30075, 0.30639]
+
+            ],
+        };
+        let inverse = mat.inverse().unwrap();
+
+        assert_approx_eq!(mat.determinant(), 532.0);
+        assert_approx_eq!(mat.cofactor(2, 3), -160.0);
+        assert_approx_eq!(inverse.data[3][2], -160.0/532.0);
+        assert_approx_eq!(mat.cofactor(3, 2), 105.0);
+        assert_approx_eq!(inverse.data[2][3], 105.0/532.0);
+
+        assert_approx_4_by_4_eq!(inverse, inverted_mat)
+    }
+
+    #[test]
+    fn another_inverse_of_4_by_4_matrix() {
+        let mat_a = Matrix4x4 {
+            data: [
+                [ 8.0, -5.0,  9.0,  2.0],
+                [ 7.0,  5.0,  6.0,  1.0],
+                [-6.0,  0.0,  9.0,  6.0],
+                [-3.0,  0.0, -9.0, -4.0]
+            ]
+        };
+
+        let inverted_mat_a = Matrix4x4 {
+            data: [
+                [-0.15385, -0.15385, -0.28205, -0.53846],
+                [-0.07692,  0.12308,  0.02564,  0.03077],
+                [ 0.35897,  0.35897,  0.43590,  0.92308],
+                [-0.69231, -0.69231, -0.76923,  -1.92308]
+            ],
+        };
+        let inverse_a = mat_a.inverse().unwrap();
+        assert_approx_4_by_4_eq!(inverse_a, inverted_mat_a);
+
+        let mat_b = Matrix4x4 {
+            data: [
+                [ 9.0,  3.0,  0.0,  9.0],
+                [-5.0, -2.0, -6.0, -3.0],
+                [-4.0,  9.0,  6.0,  4.0],
+                [-7.0,  6.0,  6.0,  2.0]
+            ]
+        };
+
+        let inverted_mat_b = Matrix4x4 {
+            data: [
+                [-0.04074, -0.07778,  0.14444, -0.22222],
+                [-0.07778,  0.03333,  0.36667, -0.33333],
+                [-0.02901, -0.14630, -0.10926,  0.12963],
+                [ 0.17778,  0.06667, -0.26667,  0.33333]
+            ],
+        };
+        let inverse_b = mat_b.inverse().unwrap();
+        assert_approx_4_by_4_eq!(inverse_b, inverted_mat_b)
+    }
+
+    #[test]
+    fn multiply_inverse_4_by_4_matrix() {
+        let mat_a = Matrix4x4 {
+            data: [
+                [ 3.0, -9.0,  7.0,  3.0],
+                [ 3.0, -8.0,  2.0, -9.0],
+                [-4.0,  4.0,  4.0,  1.0],
+                [-6.0,  5.0, -1.0,  1.0]
+            ]
+        };
+        let mat_b = Matrix4x4 {
+            data: [
+                [ 8.0,  2.0,  2.0,  2.0],
+                [ 3.0, -1.0,  7.0,  0.0],
+                [ 7.0,  0.0,  5.0,  4.0],
+                [ 6.0, -2.0,  0.0,  5.0]
+            ]
+        };
+        let mat_c = mat_a * mat_b;
+
+        assert_approx_4_by_4_eq!(mat_c * mat_b.inverse().unwrap(), mat_a);
     }
 }

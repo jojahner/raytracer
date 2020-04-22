@@ -3,11 +3,23 @@ macro_rules! assert_approx_eq {
     ($a:expr, $b:expr) => {{
         let (a, b) = (&$a, &$b);
         assert!(
-            (*a - *b).abs() < 1.0e-6,
+            (*a - *b).abs() < 1.0e-5,
             "{} is not approximately equal to {}",
             *a,
             *b
         );
+    }};
+}
+
+#[cfg(test)]
+macro_rules! assert_approx_4_by_4_eq {
+    ($a:expr, $b:expr) => {{
+        let (a, b) = (&$a, &$b);
+        for row in 0..=3 {
+            for col in 0..=3 {
+                assert_approx_eq!(a[col][row], b[col][row]);
+            }
+        }
     }};
 }
 
